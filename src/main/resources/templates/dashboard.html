@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Обзор', ${activePage}, ~{::main})}">
+<body>
+<main>
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">Состояние системы</p>
+            <h1>Обзор задач агентов</h1>
+            <p class="lead">Краткая сводка основных задач и очереди Scrum.</p>
+        </div>
+        <a class="button button--primary" th:href="@{/ui/scrum}">Добавить в Scrum</a>
+    </div>
+
+    <section class="metrics" aria-label="Сводные показатели">
+        <article class="metric metric--accent">
+            <span>Всего задач</span>
+            <strong th:text="${page.totalTasks}">0</strong>
+        </article>
+        <article class="metric">
+            <span>Запланировано</span>
+            <strong th:text="${page.plannedTasks}">0</strong>
+        </article>
+        <article class="metric">
+            <span>В работе</span>
+            <strong th:text="${page.inProgressTasks}">0</strong>
+        </article>
+        <article class="metric">
+            <span>Завершено</span>
+            <strong th:text="${page.completedTasks}">0</strong>
+        </article>
+        <article class="metric">
+            <span>Ошибки</span>
+            <strong th:text="${page.failedTasks}">0</strong>
+        </article>
+        <article class="metric">
+            <span>Scrum</span>
+            <strong th:text="${page.scrumCount}">0</strong>
+        </article>
+    </section>
+
+    <div class="dashboard-grid">
+        <section class="panel">
+            <div class="panel__heading">
+                <div>
+                    <p class="eyebrow">Последние обновления</p>
+                    <h2>Задачи</h2>
+                </div>
+                <a class="text-link" th:href="@{/ui/tasks}">Все задачи →</a>
+            </div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                    <tr><th>ID</th><th>Название</th><th>Статус</th><th>Обновлено</th></tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="task : ${page.recentTasks}">
+                        <td class="mono" th:text="${'#' + task.id}">#1</td>
+                        <td>
+                            <a class="table-link" th:href="@{/ui/tasks/{id}(id=${task.id})}"
+                               th:text="${task.title}">Название</a>
+                            <span class="subline" th:text="${task.module}">module</span>
+                        </td>
+                        <td><span class="status" th:classappend="${task.statusClass}"
+                                  th:text="${task.statusLabel}">Статус</span></td>
+                        <td class="muted nowrap" th:text="${task.updatedAt}">дата</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(page.recentTasks)}">
+                        <td colspan="4" class="empty-state">Задач пока нет</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel__heading">
+                <div>
+                    <p class="eyebrow">Очередь агентов</p>
+                    <h2>Scrum</h2>
+                </div>
+                <a class="text-link" th:href="@{/ui/scrum}">Открыть →</a>
+            </div>
+            <div class="queue-list">
+                <article class="queue-item" th:each="item : ${page.recentScrumItems}">
+                    <div class="queue-item__meta">
+                        <span class="module-tag" th:text="${item.module}">module</span>
+                        <span th:text="${item.createdAt}">дата</span>
+                    </div>
+                    <h3 th:text="${item.title}">Название</h3>
+                    <p th:text="${item.description}">Описание</p>
+                </article>
+                <p class="empty-state" th:if="${#lists.isEmpty(page.recentScrumItems)}">
+                    Очередь Scrum пуста
+                </p>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>

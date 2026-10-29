@@ -1,0 +1,60 @@
+name: Auto tag
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+      - master
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  auto-tag:
+    name: Create SemVer tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository with tags
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve source branch
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: sh
+        run: |
+          source_branch=$GITHUB_REF_NAME
+          merged_source_branch=$(
+            gh api \
+              -H 'Accept: application/vnd.github+json' \
+              "/repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" \
+              --jq ".[] | select(.merged_at != null and .base.ref == \"$GITHUB_REF_NAME\") | .head.ref" \
+              | head -n 1
+          )
+          if [ -n "$merged_source_branch" ]; then
+            source_branch=$merged_source_branch
+          fi
+          printf 'source_branch=%s\n' "$source_branch" >> "$GITHUB_OUTPUT"
+
+      - name: Calculate version
+        env:
+          CI_PROJECT_DIR: ${{ github.workspace }}
+          CI_ENV_FILE: ${{ runner.temp }}/auto-tag.env
+          CI_SOURCE_BRANCH: ${{ steps.source.outputs.source_branch }}
+          CI_JOB_ID: ${{ github.run_id }}
+        run: sh ci/version.sh
+
+      - name: Create and push tag
+        env:
+          CI_PROJECT_DIR: ${{ github.workspace }}
+          CI_ENV_FILE: ${{ runner.temp }}/auto-tag.env
+          CI_CREATE_TAG: 'true'
+          CI_PUSH_TAG: 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          sh ci/auto-tag.sh

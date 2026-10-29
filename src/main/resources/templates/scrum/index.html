@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Scrum', ${activePage}, ~{::main})}">
+<body>
+<main>
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">Единственная область записи</p>
+            <h1>Scrum-задачи для агентов</h1>
+            <p class="lead">Создавайте задания в очереди; остальные разделы остаются read-only.</p>
+        </div>
+        <span class="write-badge">SCRUM WRITE</span>
+    </div>
+
+    <div class="notice notice--success" role="status" th:if="${successMessage}"
+         th:text="${successMessage}">Scrum-задача добавлена</div>
+
+    <section class="create-panel">
+        <div class="create-panel__heading">
+            <span class="section-number section-number--light">+</span>
+            <div>
+                <p class="eyebrow eyebrow--light">Новая запись</p>
+                <h2>Новая задача для агента</h2>
+            </div>
+        </div>
+        <form class="scrum-form" method="post" th:action="@{/ui/scrum}" th:object="${scrumForm}">
+            <label class="field field--wide">
+                <span>Название</span>
+                <input type="text" th:field="*{title}" maxlength="255"
+                       placeholder="Коротко сформулируйте результат">
+                <span class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Ошибка</span>
+            </label>
+            <label class="field">
+                <span>Модуль</span>
+                <input type="text" th:field="*{module}" maxlength="255" placeholder="planner-core">
+                <span class="field-error" th:if="${#fields.hasErrors('module')}" th:errors="*{module}">Ошибка</span>
+            </label>
+            <label class="field field--full">
+                <span>Описание</span>
+                <textarea th:field="*{description}" rows="7"
+                          placeholder="Контекст, ожидаемый результат и важные ограничения"></textarea>
+                <span class="field-error" th:if="${#fields.hasErrors('description')}"
+                      th:errors="*{description}">Ошибка</span>
+            </label>
+            <div class="form-actions">
+                <button class="button button--primary" type="submit">Добавить задачу</button>
+                <span>Запись попадёт только в scrum_board_item</span>
+            </div>
+        </form>
+    </section>
+
+    <section class="filter-bar filter-bar--spaced" aria-label="Фильтр Scrum">
+        <form method="get" th:action="@{/ui/scrum}" class="filter-form">
+            <label>
+                <span>Модуль</span>
+                <select name="module">
+                    <option value="">Все модули</option>
+                    <option th:each="module : ${page.modules}"
+                            th:value="${module}"
+                            th:selected="${page.moduleFilter == module}"
+                            th:text="${module}">module</option>
+                </select>
+            </label>
+            <button class="button button--dark" type="submit">Применить</button>
+            <a class="button button--ghost" th:href="@{/ui/scrum}">Сбросить</a>
+        </form>
+    </section>
+
+    <section class="panel">
+        <div class="panel__heading">
+            <div><p class="eyebrow">Текущая очередь</p><h2>Scrum</h2></div>
+            <span class="counter" th:text="${page.items.size() + ' записей'}">0 записей</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>ID</th><th>Задача</th><th>Описание</th><th>Модуль</th><th>Создано</th></tr></thead>
+                <tbody>
+                <tr th:each="item : ${page.items}">
+                    <td class="mono" th:text="${'#' + item.id}">#1</td>
+                    <td class="title-cell" th:text="${item.title}">Название</td>
+                    <td class="pre-wrap description-cell" th:text="${item.description}">Описание</td>
+                    <td><span class="module-tag" th:text="${item.module}">module</span></td>
+                    <td class="muted nowrap" th:text="${item.createdAt}">дата</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(page.items)}">
+                    <td colspan="5" class="empty-state">Scrum-задач пока нет</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

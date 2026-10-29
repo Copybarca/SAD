@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Не найдено', ${activePage}, ~{::main})}">
+<body>
+<main>
+    <section class="error-panel">
+        <div class="error-code">404</div>
+        <p class="eyebrow">Запись не найдена</p>
+        <h1 th:text="${message}">Задача не найдена</h1>
+        <p>Проверьте идентификатор или вернитесь к списку задач.</p>
+        <a class="button button--primary" th:href="@{/ui/tasks}">К списку задач</a>
+    </section>
+</main>
+</body>
+</html>

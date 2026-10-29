@@ -1,0 +1,202 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-agent-tables
+      author: auto-dev-app
+      changes:
+        - createTable:
+            tableName: development_task
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_development_task
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: specification
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: module
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: result_description
+                  type: TEXT
+              - column:
+                  name: status
+                  type: VARCHAR(32)
+                  defaultValue: PLANNED
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: affected_class
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_affected_class
+                    nullable: false
+              - column:
+                  name: task_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: class_name
+                  type: VARCHAR(500)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: change_description
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: task_action
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_task_action
+                    nullable: false
+              - column:
+                  name: task_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action_description
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: action_result
+                  type: TEXT
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: scrum_board_item
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_scrum_board_item
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: module
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: affected_class
+            baseColumnNames: task_id
+            referencedTableName: development_task
+            referencedColumnNames: id
+            constraintName: fk_affected_class_task
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: task_action
+            baseColumnNames: task_id
+            referencedTableName: development_task
+            referencedColumnNames: id
+            constraintName: fk_task_action_task
+            onDelete: CASCADE
+        - addUniqueConstraint:
+            tableName: affected_class
+            columnNames: task_id, class_name
+            constraintName: uk_affected_class_task_name
+        - createIndex:
+            tableName: development_task
+            indexName: idx_development_task_created
+            columns:
+              - column:
+                  name: created_at
+              - column:
+                  name: id
+        - createIndex:
+            tableName: affected_class
+            indexName: idx_affected_class_task
+            columns:
+              - column:
+                  name: task_id
+        - createIndex:
+            tableName: task_action
+            indexName: idx_task_action_history
+            columns:
+              - column:
+                  name: task_id
+              - column:
+                  name: created_at
+              - column:
+                  name: id
+        - createIndex:
+            tableName: scrum_board_item
+            indexName: idx_scrum_board_created
+            columns:
+              - column:
+                  name: created_at
+              - column:
+                  name: id

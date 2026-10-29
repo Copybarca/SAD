@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      th:fragment="layout(pageTitle, activePage, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${pageTitle + ' — AUTO DEV'}">AUTO DEV</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}" href="/css/app.css">
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" th:href="@{/ui}">
+        <span class="brand__mark">A</span>
+        <span>AUTO DEV</span>
+    </a>
+    <nav class="nav" aria-label="Основная навигация">
+        <a class="nav__link"
+           th:classappend="${activePage == 'dashboard'} ? 'nav__link--active' : ''"
+           th:href="@{/ui}">Обзор</a>
+        <a class="nav__link"
+           th:classappend="${activePage == 'tasks'} ? 'nav__link--active' : ''"
+           th:href="@{/ui/tasks}">Задачи</a>
+        <a class="nav__link"
+           th:classappend="${activePage == 'scrum'} ? 'nav__link--active' : ''"
+           th:href="@{/ui/scrum}">Scrum</a>
+    </nav>
+    <span class="mode-label">READ / SCRUM WRITE</span>
+</header>
+
+<div class="workspace">
+    <aside class="rail" aria-label="Режим работы">
+        <div class="rail__label">AGENT WORKSPACE</div>
+        <p>Результаты и история доступны только для чтения.</p>
+        <p class="rail__accent">Новые задания создаются в Scrum.</p>
+    </aside>
+    <div class="page" th:insert="${content}"></div>
+</div>
+
+<footer class="footer">
+    <span>AUTO DEV APP</span>
+    <span>Локальная панель задач агентов</span>
+</footer>
+</body>
+</html>

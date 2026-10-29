@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Задачи', ${activePage}, ~{::main})}">
+<body>
+<main>
+    <div class="page-heading">
+        <div>
+            <p class="eyebrow">Только чтение</p>
+            <h1>Задачи агентов</h1>
+            <p class="lead">Постановки, состояния и результаты выполненной работы.</p>
+        </div>
+        <span class="read-only-badge">READ ONLY</span>
+    </div>
+
+    <section class="filter-bar" aria-label="Фильтры задач">
+        <form method="get" th:action="@{/ui/tasks}" class="filter-form">
+            <label>
+                <span>Модуль</span>
+                <select name="module">
+                    <option value="">Все модули</option>
+                    <option th:each="module : ${page.modules}"
+                            th:value="${module}"
+                            th:selected="${page.moduleFilter == module}"
+                            th:text="${module}">module</option>
+                </select>
+            </label>
+            <label>
+                <span>Статус</span>
+                <select name="status">
+                    <option value="">Все статусы</option>
+                    <option th:each="status : ${page.statuses}"
+                            th:value="${status.code}"
+                            th:selected="${page.statusFilter == status.code}"
+                            th:text="${status.label}">status</option>
+                </select>
+            </label>
+            <button class="button button--dark" type="submit">Применить</button>
+            <a class="button button--ghost" th:href="@{/ui/tasks}">Сбросить</a>
+        </form>
+    </section>
+
+    <section class="panel">
+        <div class="panel__heading">
+            <h2>Список</h2>
+            <span class="counter" th:text="${page.tasks.size() + ' записей'}">0 записей</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr><th>ID</th><th>Название</th><th>Модуль</th><th>Статус</th><th>Обновлено</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="task : ${page.tasks}">
+                    <td class="mono" th:text="${'#' + task.id}">#1</td>
+                    <td><a class="table-link" th:href="@{/ui/tasks/{id}(id=${task.id})}"
+                           th:text="${task.title}">Название</a></td>
+                    <td><span class="module-tag" th:text="${task.module}">module</span></td>
+                    <td><span class="status" th:classappend="${task.statusClass}"
+                              th:text="${task.statusLabel}">Статус</span></td>
+                    <td class="muted nowrap" th:text="${task.updatedAt}">дата</td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(page.tasks)}">
+                    <td colspan="5" class="empty-state">По выбранным фильтрам задач нет</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>
